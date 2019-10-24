@@ -1,0 +1,7 @@
+一.并发和并行
+    并发：多个任务在一段时间内都进行，具体的某一个时刻只能有一个任务在进行
+    并行：多个任务在一段时间内都进行，具体的某一个时刻有多个任务在进行。
+二.多进程三种方式
+    1.fork，不常用。主进程不等待子进程。    利用fork创建多进程，fork在windows里没有，fork有两个返回值，父进程返回的是子进程的pid号，子进程返回的是0.getpid返回的是该进程的pid号，getppid返回的是该进程的父进程号
+    2.multiprocessing 中的Process类进行创建，需要对Process进行实例化创建进程，创建完成后需要用start进行启动，主进程等待子进程结束后才结束。join是堵塞的。Process的子类实现时，需要重写run方法，然后进行start即可。Process创建的进程进行通信时，需要用multiprocessing中的Queue进行实现通信。
+    3.进程池：实例化multiprocessing中的Pool，接下来非堵塞式添加任务apply_async(目标函数)，关闭进程池close，join进行等待进程池中所有子进程结束用在close后面。进程池里的通信用multiprocessing中的Manager，Manager().Queue()
