@@ -1,0 +1,61 @@
+一.网络层级复习
+    应用层:解决传输什么数据
+    传输层:解决如何传输数据UDP TCP
+    网络层:IP
+    链路层:MAC地址
+二.HTTP协议
+客户端发送请求:
+    GET / HTTP/1.1
+
+    Host: www.baidu.com
+    Connection: keep-alive
+    Cache-Control: max-age=0
+    Upgrade-Insecure-Requests: 1
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36                (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36
+    Sec-Fetch-User: ?1
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,           image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+    Sec-Fetch-Site: none
+    Sec-Fetch-Mode: navigate
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: zh-CN,zh;q=0.9
+    Cookie: BAIDUID=8A648435F368269B1467843C172354FD:FG=1;      BIDUPSID=8A648435F368269B1467843C172354FD; PSTM=1562143956;     BD_UPN=12314753; ispeed_lsm=2;  COOKIE_SESSION=16367_15_6_1_1_8_0_0_3_4_1_1_0_64662_0_35_1571288058_1572265451_1572265416%7C9%2364674_18_1572265416%7C5; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; delPer=0; BD_HOME=0; H_PS_PSSID=1442_21099_29567_29221_22160
+
+    第一行为报文的起始行
+    后面的为请求头以键值对的格式存在,\r\n进行换行
+    \r\n
+    接下来为请求体
+
+    HTTP请求方式:
+        GET 获取数据
+        POST 修改数据
+        PUT 保存数据
+        DELETE 删除数据
+        OPTION 询问服务器的某种支持特性
+        HEAD 返回报文头
+
+服务器回应请求:
+    HTTP/1.1 200 OK
+    Bdpagetype: 1
+    Bdqid: 0xe93ca3f20000bb02
+    Cache-Control: private
+    Connection: Keep-Alive
+    Content-Encoding: gzip
+    Content-Type: text/html
+    Cxy_all: baidu+b3912c0d51409d07291af35bbd967f2f
+    Date: Tue, 29 Oct 2019 18:32:26 GMT
+    Expires: Tue, 29 Oct 2019 18:31:48 GMT
+    Server: BWS/1.1
+    Set-Cookie: delPer=0; path=/; domain=.baidu.com
+    Set-Cookie: BDSVRTM=0; path=/
+    Set-Cookie: BD_HOME=0; path=/
+    Set-Cookie: H_PS_PSSID=1442_21099_29567_29221_22160; path=/; domain=.baidu.com
+    Strict-Transport-Security: max-age=172800
+    Traceid: 1572373946023799041016806488169217309442
+    Vary: Accept-Encoding
+    X-Ua-Compatible: IE=Edge,chrome=1
+    Transfer-Encoding: chunked
+
+    第一行为起始行 200 OK 为状态码 即status code
+    接下来是响应头 同样是以键值对存在\r\n
+    \r\n
+    接下来是响应体
