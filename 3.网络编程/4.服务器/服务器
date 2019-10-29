@@ -1,0 +1,44 @@
+一.单进程非堵塞服务器
+    设置主动套接字为非堵塞
+    serversocket.setblocking(False)加上这句话后,如果在accept时没有客户端来则产生异常
+二.select服务器
+    优点:支持多个平台
+    缺点:单进程中能够监听的套接字只能放1024个套接字64位操作系统2048个
+    readable,writeable,errable = select.select(input,[],[]) 进行检测是否有消息
+三.IO多路复用:意思是单进程里实现并发
+四.stdin,stdout,stderr
+    标准输入->键盘 sys.stdin.fileno() 返回0
+    标准输出->屏幕 sys.stdout.fileno() 返回1
+    标准错误->屏幕 sys.stderr.fileno() 返回2
+    数字就是文件描述符
+五.poll和epoll
+    poll解决了select有上限的问题,但是和select都是用轮询的方式检测,所以效率低.
+    epoll没有上限,但不是轮询,是事件通知机制
+    s = socket(AF_INET, SOCK_STREAM)
+    a = select.epoll()实例化对象
+    a.register(s.fileno(), select.EPOLLIN|select.EPOLLET) 进行注册
+    a.poll() 进行检测相当于select(input,[],[])
+    说明:EPOLLIN 只检测注册的这个套接字可不可以收数据
+        EPOLLOUT 只检测注册的这个套接字可不可以发数据
+        EPOLLET 边沿触发 即只有一次通知
+        EPOLLLT 水平触发 一直通知到处理完,否则一直通知
+六.IO密集型和计算密集型
+    计算密集型:消耗大量cpu资源->用多进程实现
+    IO密集型:使用多线程和协程
+七.协程
+    一.生成器
+    二.greenlet 
+    from greenlet import greenlet
+
+    def test1():
+        gr2.switch()
+        
+    def test2():
+        gr1.switch()
+
+    gr1 = greenlet(test1)
+    gr2 = greenlet(test2)
+    gr1.switch()
+    三.gevent
+    注意:gevent.spawn(函数名,函数所需参数)
+        套接字从gevent模块导入,延时操作需要gevent.sleep()
