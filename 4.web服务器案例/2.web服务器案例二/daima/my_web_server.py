@@ -17,6 +17,7 @@ class HTTPServer(object):
         self.server_socket = socket(AF_INET, SOCK_STREAM)
         # 设置多次使用
         self.server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        # 框架的app
         self.app = app
 
     def start(self):
@@ -55,6 +56,8 @@ class HTTPServer(object):
         file_name = re.match(r"\w+ +(/[^ ]*) ", request_start_line.decode("utf-8")).group(1) #返回值为字符串
         
         env = {"PATH_INFO": file_name} # 字典 存放解析到的其他东西
+
+        # 调用框架接口
         response_body = self.app(env, self.start_response)
 
         # 构造响应数据
@@ -72,15 +75,21 @@ class HTTPServer(object):
         self.server_socket.bind(("", port))
         
 
-    
 def main():
     sys.path.insert(1, WSGI_PYTHON_DIR)
+    if len(sys.argv) < 2:
+        sys.exit('python3 my_web_server.py Module:app')
+    module_name, app_name = sys.argv[1].split(":")
+    m = __import__(module_name) # 动态加载模块
+    app = getattr(m, app_name) # 获取动态模块里面的东西
+
     # 创建服务器对象
-    http_server = HTTPServer()
+    http_server = HTTPServer(app)
     # 调用绑定端口号的方法
     http_server.set_port(8989)
     # 启动服务器
     http_server.start()
+
 
 if __name__ == "__main__":
     main()

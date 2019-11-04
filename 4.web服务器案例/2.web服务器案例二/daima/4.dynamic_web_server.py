@@ -7,6 +7,7 @@ from multiprocessing import Process
 # 设置静态文件根目录
 HTML_ROOT_DIR = "./1.html"
 
+# 设置动态文件根目录
 WSGI_PYTHON_DIR = "./wsgipython"
 
 class HTTPServer(object):
@@ -38,7 +39,7 @@ class HTTPServer(object):
         """
         # 构建响应头
         response_headers = "HTTP/1.1 " + status + "\r\n"
-        for header in headers:
+        for header in h eaders:
             response_headers += "%s: %s\r\n" % header
         self.response_headers = response_headers
         
@@ -53,9 +54,9 @@ class HTTPServer(object):
         request_start_line = request_lines_list[0]
         file_name = re.match(r"\w+ +(/[^ ]*) ", request_start_line.decode("utf-8")).group(1) #返回值为字符串
         
-        if file_name.endswith(".py"):
+         if file_name.endswith(".py"):
             try:
-                m = __import__(file_name[1:-3]) # 从1开始取但取不到-3，返回值相当于起个别名
+                m = __import__(file_name[1:-3]) # 从1开始取但取不到-3，返回值相当于起个别名 
             except Exception:
                 self.response_headers = "HTTP/1.1 404 NOT FOUND\r\n"
                 response_body = "not found"
@@ -97,7 +98,6 @@ class HTTPServer(object):
         self.server_socket.bind(("", port))
         
 
-    
 def main():
     sys.path.insert(1, WSGI_PYTHON_DIR)
     # 创建服务器对象

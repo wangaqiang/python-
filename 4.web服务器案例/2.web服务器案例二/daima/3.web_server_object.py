@@ -6,6 +6,7 @@ from multiprocessing import Process
 # 设置静态文件根目录
 HTML_ROOT_DIR = "./1.html"
 
+
 class HTTPServer(object):
     """web服务器类"""
     def __init__(self):

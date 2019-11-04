@@ -1,0 +1,96 @@
+ 一.WSGI
+    1.定义一个envrionment的变量,该变量是一个字典,存放着客户端传来的请求信息
+    envrionment={
+        'PATH_INFO':'客户端请求路径',
+        'METHOD':'客户端请求方式'
+    }
+
+    2.在服务器中定义一个start_response函数用于处理服务器响应客户端时的回应头,它需要传两个参数,第一个为状态码,第二个为响应头,将响应头拼接好后存入到对象中,方便后面调用
+    服务器:def start_response(status, headers):
+              response_header = 'HTTP/1.1 ' + status + '\r\n'
+              for header in headers:
+                  response_header += "%s: %s\r\n"%header
+              self.response_header = response_header        
+
+    3.在服务器中调用函数application,这个函数在动态模板中实现,需要传入前面创建的envrionment变量和start_response函数,envrionment用来给动态程序提供客户端请求信息,start_response用来接受动态程序的状态码和服务器即将回应客户端的响应头.application函数返回值为响应体
+    服务器:m = __import__(文件名)
+          response_body = m.application(envrionment, start_response)
+          response = self.response_header + '\r\n' + response_body
+
+
+    4.在动态程序中实现application函数,接受前面说的两个参数.该函数返回值为服务器的响应头,所以在里面调用服务器传过来的start_response函数用来将状态码和响应头穿过去进行保存到对象
+    动态程序:def application(envrionment, start_response):
+                执行应该执行的代码(如果用到envrionment的东西,通过envrionment.get()进行取值)
+                status = '200 OK'
+                headers = [
+                    ('Content-Type','html'),
+                    ('响应头的键','响应头的值')
+                ]
+                start_response(status, headers)
+                return '响应体内容'
+
+二.框架原理
+    按照WSGI协议,写一个类,类里面构造方法实现路由列表,类里面实现CALL方法供服务器调用,服务器只调用该类对象的这个接口,call方法进行服务器接受到的路由信息与自己的路由列表进行一一判断,找到就取相对应的函数处理,否则就返回404.
+    框架:class Application():
+            def __init__(self,urls):
+                self.urls = urls
+            
+            def __call__(self, env, start_response):
+                path = env.get('PATH_INFO', '/') 第二个参数为设置的默认路径
+                for url, handler in self.urls:
+                    if url == path:
+                        return handler() 将对应的函数处理结果进行返回给服务器
+                没找到对应的路由函数时,则进行报错处理
+                status = '404 Not Found'
+                headers = []
+                start_response(status, headers)
+                return '你要找的资源不存在'
+
+        def handler():
+            做要做的事
+            status = '200 OK'
+            headers = []
+            start_response(status, headers)
+            return 响应体内容
+
+    服务器:在构造函数中将框架实现的对象进行保存,在子进程中进行handle_client时,调用这个对象即可.
+    from 框架文件 import Application
+    from mutilprocessing import Process
+
+    class Server(object):
+        def __init__(self, app):
+            self.server_socket = socket(AF_INET, SOCK_STREAM)
+            self.app = app
+    
+        def start_response(self, status, headers):
+            response_header = 'HTTP/1.1 ' + status + '\r\n'
+            for header in headers:
+                response_header += "%s: %s\r\n"%header
+            self.response_header = response_header   
+
+        def start(self, port):
+            self.server_socket.bind(('', port))
+            self.server_socket.listen(10)
+            while True:
+                client_socket, client_info = self.server_socket.accept()    
+                handle_client_process = Process(
+                                            target=handle_client, 
+                                            args=(client_socket,))
+                handle_client_process.start()
+                handle_client_process.close()
+
+        def handle_client(self):
+            recv_data = client_socket.recv()
+            re.match('',recv_data) 进行收到的数据提取
+            env = {} 组建字典
+            response_body = self.app(env, self.start_response)
+            response = response_header + '\r\n' + response_body
+            client_socket.send(response)
+    if __name__ == '__main__':
+        urls = []
+        app = Application(urls)
+        server = Server(app)
+        server.start(port)
+三.sys.argv参数问题
+    python 文件名 参数1 参数2
+    sys.argv获得的列表第一个参数是文件名,第二个参数是参数1.
